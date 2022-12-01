@@ -1,6 +1,7 @@
 import { useAccount } from 'wagmi'
 
 import { Account, Connect, NetworkSwitcher } from '../components'
+import { SendTransaction } from '../components/SendTransaction'
 
 function Page() {
   const { isConnected } = useAccount()
@@ -14,6 +15,7 @@ function Page() {
       {isConnected && (
         <>
           <Account />
+          <SendTransaction />
           <NetworkSwitcher />
         </>
       )}

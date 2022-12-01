@@ -1,31 +1,36 @@
+import { Wallet } from 'ethers'
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
+import { EOAConnector } from '../EOAConnector'
+import { chains } from '../wagmi'
 
 export function Connect() {
-  const { connector, isConnected } = useAccount()
-  const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect()
+  const { connector, isConnected, isDisconnected } = useAccount()
+  const { connect } = useConnect()
   const { disconnect } = useDisconnect()
+
+  const create = () => {
+    const wallet = Wallet.createRandom()
+    connect({
+      connector: new EOAConnector({
+        chains,
+        options: {
+          privateKey: wallet.privateKey
+        },
+      })
+    })
+  }
 
   return (
     <div>
-      <div>
-        {isConnected && (
-          <button onClick={() => disconnect()}>
-            Disconnect from {connector?.name}
-          </button>
-        )}
+      {isConnected && (
+        <button onClick={() => disconnect()}>
+          Disconnect from {connector?.name}
+        </button>
+      )}
 
-        {connectors
-          .filter((x) => x.ready && x.id !== connector?.id)
-          .map((x) => (
-            <button key={x.id} onClick={() => connect({ connector: x })}>
-              {x.name}
-              {isLoading && x.id === pendingConnector?.id && ' (connecting)'}
-            </button>
-          ))}
-      </div>
-
-      {error && <div>{error.message}</div>}
+      {isDisconnected && (
+        <button onClick={() => create()}>Create wallet</button>
+      )}
     </div>
   )
 }
